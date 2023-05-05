@@ -1,27 +1,63 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello GameController!
-{% endblock %}
-
 {% block body %}
 	<style>
-		.example-wrapper {
-			margin: 1em auto;
-			max-width: 800px;
-			width: 95%;
-			font: 18px / 1.5 sans-serif;
+		.board {
+			border-collapse: collapse;
 		}
-		.example-wrapper code {
-			background: #F5F5F5;
-			padding: 2px 6px;
+
+		.board__cell {
+			width: 25px;
+			height: 25px;
+			border: 1px solid #000;
+		}
+
+		.board__cell--yellow {
+			background-color: yellow
+		}
+
+		.board__cell--red {
+			background-color: red
 		}
 	</style>
 
-	<div class="example-wrapper">
-		<h1>Hello
-			{{ controller_name }}! ✅</h1>
+	<h1>Puissance 4</h1>
+	<p>À vous de jouer
+		{{currentPlayer}}</p>
 
-		<a href="play">Démarrer une partie</a>
+	{# RESULT SECTION #}
+	{% if isEnd != null %}
+		<div class="end">
+			<p class="end__text">
+				{% if isEnd == 'tie' %}
+					Egalité !
+				{% else %}
+					{{ winner }}
+					est le vainqueur !
+				{% endif %}
+			</p>
+			<a href="/reset">Recommencer une partie</a>
+		</div>
+	{% endif %}
 
-	</div>
+	<table class="board">
+		{% for row in board %}
+			<tr class="board__row">
+				{% for cell in row %}
+					{% if cell == 'red' %}
+						<td class="board__cell board__cell--red"></td>
+					{% elseif cell == 'yellow' %}
+						<td class="board__cell board__cell--yellow"></td>
+					{% else %}
+						<td class="board__cell board__cell--empty">
+							<form method="post" action="{{ path('app_game') }}">
+								<input type="hidden" name="column" value="{{ loop.index0 }}">
+								<input type="submit" value="">
+							</form>
+						</td>
+					{% endif %}
+				{% endfor %}
+			</tr>
+		{% endfor %}
+	</table>
 {% endblock %}

@@ -16,18 +16,18 @@ class GameController extends AbstractController
     private const BOARD_COLUMNS = 7;
     private const BOARD_ROWS = 6;
 
+    // #[Route('/game', name: 'app_game')]
+    // public function index(Request $request): Response
+    // {
+    //     $board = $request->getSession()->get('board', $this->getEmptyBoard());
+    //     $currentPlayer = $request->getSession()->get('currentPlayer', 'yellow');
+
+    //     return $this->render('game/index.html.twig', [
+    //         'controller_name' => 'GameController'
+    //     ]);
+    // }
+
     #[Route('/game', name: 'app_game')]
-    public function index(Request $request): Response
-    {
-        $board = $request->getSession()->get('board', $this->getEmptyBoard());
-        $currentPlayer = $request->getSession()->get('currentPlayer', 'yellow');
-
-        return $this->render('game/index.html.twig', [
-            'controller_name' => 'GameController'
-        ]);
-    }
-
-    #[Route('/play', name: 'game_play')]
     public function play(Request $request): Response
     {
         $board = $request->getSession()->get('board', $this->getEmptyBoard());
@@ -52,7 +52,7 @@ class GameController extends AbstractController
             }
         }
 
-        return $this->render('game/board.html.twig', [
+        return $this->render('game/index.html.twig', [
             'board' => $board,
             'currentPlayer' => $currentPlayer,
             'isEnd' => $isEnd,
