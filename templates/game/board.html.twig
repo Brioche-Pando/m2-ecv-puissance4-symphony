@@ -24,6 +24,22 @@
 	<h1>Puissance 4</h1>
 	<p>À vous de jouer
 		{{currentPlayer}}</p>
+
+	{# RESULT SECTION #}
+	{% if isEnd != null %}
+		<div class="end">
+			<p class="end__text">
+				{% if isEnd == 'tie' %}
+					Egalité !
+				{% else %}
+					{{ winner }}
+					est le vainqueur !
+				{% endif %}
+			</p>
+			<a href="/reset">Fermer la game instance</a>
+		</div>
+	{% endif %}
+
 	<table class="board">
 		{% for row in board %}
 			<tr class="board__row">

@@ -32,14 +32,17 @@ class GameController extends AbstractController
     {
         $board = $request->getSession()->get('board', $this->getEmptyBoard());
         $currentPlayer = $request->getSession()->get('currentPlayer', 'yellow');
+        $isEnd = false;
+        $winner = false;
 
         if ($request->isMethod('POST')) {
             $column = $request->get('column');
             $board = $this->addTokenToColumn($board, $column, $currentPlayer);
             $isEnd = $this->checkEndGame($board, $currentPlayer);
-            
+
+            var_dump($isEnd);
             if ($isEnd) {
-                var_dump($currentPlayer . 'est le vainqueur !!!! ');
+                $winner = $isEnd === 'tie' ? 'tie' : $currentPlayer;
             } else {
                 // Switch player
                 $currentPlayer = ($currentPlayer === 'yellow') ? 'red' : 'yellow';
@@ -51,7 +54,9 @@ class GameController extends AbstractController
 
         return $this->render('game/board.html.twig', [
             'board' => $board,
-            'currentPlayer' => $currentPlayer
+            'currentPlayer' => $currentPlayer,
+            'isEnd' => $isEnd,
+            'winner' => $winner
         ]);
     }
 
@@ -84,7 +89,7 @@ class GameController extends AbstractController
         return $board;
     }
 
-    private function checkEndGame(array $board, string $player): bool
+    private function checkEndGame(array $board, string $player): string
     {
 
         // Check horizontal
@@ -94,7 +99,7 @@ class GameController extends AbstractController
                 if ($board[$i][$j] === $player) {
                     $count++;
                     if ($count === 4) {
-                        return true;
+                        return $player;
                     }
                 } else {
                     $count = 0;
@@ -109,7 +114,7 @@ class GameController extends AbstractController
                 if ($board[$i][$j] === $player) {
                     $count++;
                     if ($count === 4) {
-                        return true;
+                        return $player;
                     }
                 } else {
                     $count = 0;
@@ -125,7 +130,7 @@ class GameController extends AbstractController
                     if ($board[$i + $k][$j + $k] === $player) {
                         $count++;
                         if ($count === 4) {
-                            return true;
+                            return $player;
                         }
                     } else {
                         $count = 0;
@@ -142,7 +147,7 @@ class GameController extends AbstractController
                     if ($board[$i - $k][$j + $k] === $player) {
                         $count++;
                         if ($count === 4) {
-                            return true;
+                            return $player;
                         }
                     } else {
                         $count = 0;
@@ -160,6 +165,6 @@ class GameController extends AbstractController
             }
         }
 
-        return true;
+        return 'tie';
     }
 }
