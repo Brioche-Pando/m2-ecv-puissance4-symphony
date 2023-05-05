@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<style>
+		.board {
+			border-collapse: collapse;
+		}
+
+		.board__cell {
+			width: 25px;
+			height: 25px;
+			border: 1px solid #000;
+		}
+
+		.board__cell--yellow {
+			background-color: yellow
+		}
+
+		.board__cell--red {
+			background-color: red
+		}
+	</style>
+
+	<h1>Puissance 4</h1>
+	<p>À vous de jouer
+		{{currentPlayer}}</p>
+	<table class="board">
+		{% for row in board %}
+			<tr class="board__row">
+				{% for cell in row %}
+					{% if cell == 'red' %}
+						<td class="board__cell board__cell--red"></td>
+					{% elseif cell == 'yellow' %}
+						<td class="board__cell board__cell--yellow"></td>
+					{% else %}
+						<td class="board__cell board__cell--empty">
+							<form method="post" action="{{ path('game_play') }}">
+								<input type="hidden" name="column" value="{{ loop.index0 }}">
+								<input type="submit" value="">
+							</form>
+						</td>
+					{% endif %}
+				{% endfor %}
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock %}
