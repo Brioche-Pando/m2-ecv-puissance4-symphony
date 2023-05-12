@@ -1,20 +1,106 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello AdminController!{% endblock %}
+{% block title %}Hello AdminController!
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+	<style>
+		.cards {
+			display: flex;
+			flex-wrap: wrap;
+		}
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+		.card {
+			width: fit-content;
+			padding: 16px;
+			background-color: #FFF;
+			box-shadow: 0 0 6px -1px rgba(0, 0, 0, 0.13), 0 2px 4px -1px rgba(0, 0, 0, 0.09);
+		}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/wamp64/www/workspace/ecv/m2/m2.ecv.puissance4-symphony/src/Controller/AdminController.php'|file_link(0) }}">src/Controller/AdminController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/wamp64/www/workspace/ecv/m2/m2.ecv.puissance4-symphony/templates/admin/index.html.twig'|file_link(0) }}">templates/admin/index.html.twig</a></code></li>
-    </ul>
-</div>
+		.card__inner {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-evenly;
+			gap: 32px;
+		}
+
+        .card__content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .card p {
+            margin: 0
+        }
+
+		.board {
+			border-collapse: collapse;
+		}
+
+		.board__row {
+			display: flex;
+		}
+
+		.board__cell {
+			width: 10px;
+			height: 10px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border: 1px solid #000;
+		}
+
+		.board__cell--yellow {
+			background-color: yellow
+		}
+
+		.board__cell--red {
+			background-color: red
+		}
+	</style>
+
+	<h1>Parties enregistrées</h1>
+
+	{%if games %}
+		<div class="cards">
+			{% for game in games %}
+				<div class="card">
+					<h3 class="card__title">Partie n°
+						{{ game.id }}</h3>
+					<div class="card__inner">
+						<div class="card__content">
+							<p class="card__date">Date :
+								{{ game.date|date('Y-m-d H:i:s') }}</p>
+							<p class="card__player">Joueur 1 :
+								{{ game.player1 }}</p>
+							<p class="card__player">Joueur 2 :
+								{{ game.player2 }}</p>
+							<p class="card_winner">Vainqueur :
+								{{ game.winner }}</p>
+							<p class="card__duration">Durée :
+								{{ game.duration }}</p>
+						</div>
+						<table class="board">
+							{% for row in game.board %}
+								<tr class="board__row">
+									{% for cell in row %}
+										{% if cell == 'red' %}
+											<td class="board__cell board__cell--red"></td>
+										{% elseif cell == 'yellow' %}
+											<td class="board__cell board__cell--yellow"></td>
+										{% else %}
+											<td class="board__cell board__cell--empty"></td>
+										{% endif %}
+									{% endfor %}
+								</tr>
+							{% endfor %}
+						</table>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	{% else %}
+		<p>Aucune partie n'est enregistrée pour le moment</p>
+	{% endif %}
 {% endblock %}
