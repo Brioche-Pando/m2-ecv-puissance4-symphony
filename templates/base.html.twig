@@ -1,19 +1,64 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			{% block title %}Welcome!
+			{% endblock %}
+		</title>
+		<link
+		rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+		{# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
+		{% block stylesheets %}
+			{{ encore_entry_link_tags('app') }}
+		{% endblock %}
 
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
-</html>
+		{% block javascripts %}
+			{{ encore_entry_script_tags('app') }}
+		{% endblock %}
+	</head>
+	<body>
+		<nav>
+			{% if is_granted('ROLE_USER') %}
+				<ul style="display: flex; gap: 32px">
+					<li>
+						<a href="/logout">Déconnexion</a>
+					</li>
+					<li>
+						<a href="/">Home</a>
+					</li>
+					<li>
+						<a href="/game">Jouer</a>
+					</li>
+					{% if is_granted('ROLE_ADMIN') %}
+						<li>
+							<a href="/admin">Espace admin</a>
+						</li>
+					{% endif %}
+					{% if is_granted('IS_IMPERSONATOR') %}
+						<li>
+							<a href="{{ impersonation_exit_path(path('app_admin'))}}">Exit impersonate</a>
+						</li>
+					{% endif %}
+
+				</ul>
+			{% else %}
+				<ul style="display: flex; gap: 32px">
+					<li>
+						<a href="/">Home</a>
+					</li>
+					<li>
+						<a href="/login">Se connecter</a>
+					</li>
+				</ul>
+			{% endif %}
+		</nav>
+		{% block body %}{% endblock %}
+	</body>
+</html></body></html><style>* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: sans-serif;
+}</style></body></html></body></html>

@@ -5,6 +5,12 @@
 
 {% block body %}
 	<style>
+		.user {
+			display: flex;
+			align-items: baseline;
+			gap: 12px
+		}
+
 		.cards {
 			display: flex;
 			flex-wrap: wrap;
@@ -12,7 +18,7 @@
 
 		.card {
 			width: fit-content;
-			padding: 16px;
+			padding: 8px;
 			background-color: #FFF;
 			box-shadow: 0 0 6px -1px rgba(0, 0, 0, 0.13), 0 2px 4px -1px rgba(0, 0, 0, 0.09);
 		}
@@ -30,8 +36,9 @@
 			gap: 8px;
 		}
 
+		.card h3,
 		.card p {
-			margin: 0
+			margin: 0 0 8px
 		}
 
 		.board {
@@ -60,76 +67,83 @@
 		}
 	</style>
 	{% if users %}
-		<h2>Liste des utilisateurs :</h2>
-		<ul class="users">
-			{% for user in users %}
-				<li class="user">
-					<p class="user__id">ID :
-						{{ user.id }}</p>
-					<p class="user__id">Roles :
-						{% for role in user.roles %}
-							<span>{{role}}</span>
-						{% endfor %}
-					</p>
-					<p class="user__email">Email :
-						{{ user.email }}</p>
-					<form action="{{ path('admin_block_user', { 'userId': user.id }) }}" method="post">
-						<input type="hidden" name="_token" value="{{ csrf_token('block_user_' ~ user.id) }}">
-						<button type="submit" class="btn btn-block">
-							{% if user.blocked %}
-								Débloquer
-							{% else %}
-								Bloquer
-							{% endif %}
-						</button>
-					</form>
-
-				</li>
-			{% endfor %}
-		</ul>
-		{% else %}
+		<details>
+			<summary>
+				Liste des utilisateurs :
+			</summary>
+			<ul class="users">
+				{% for user in users %}
+					<li class="user">
+						<p class="user__id">ID :
+							{{ user.id }}</p>
+						<p class="user__id">Roles :
+							{% for role in user.roles %}
+								<span>{{role}}</span>
+							{% endfor %}
+						</p>
+						<p class="user__email">Email :
+							{{ user.email }}</p>
+						<form action="{{ path('admin_block_user', { 'userId': user.id }) }}" method="post">
+							<input type="hidden" name="_token" value="{{ csrf_token('block_user_' ~ user.id) }}">
+							<button type="submit" class="btn btn-block">
+								{% if user.blocked %}
+									Débloquer
+								{% else %}
+									Bloquer
+								{% endif %}
+							</button>
+						</form>
+						<a href="{{ path('app_game')}}?_switch_user={{ user.email }}">impersonate</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</details>
 	{% endif %}
 
 	{%if games %}
-		<h2>Parties enregistrées</h2>
-		<div class="cards">
-			{% for game in games %}
-				<div class="card">
-					<h3 class="card__title">Partie n°
-						{{ game.id }}</h3>
-					<div class="card__inner">
-						<div class="card__content">
-							<p class="card__date">Date :
-								{{ game.date|date('Y-m-d H:i:s') }}</p>
-							<p class="card__player">Joueur 1 :
-								{{ game.player1 }}</p>
-							<p class="card__player">Joueur 2 :
-								{{ game.player2 }}</p>
-							<p class="card_winner">Vainqueur :
-								{{ game.winner }}</p>
-							<p class="card__duration">Durée :
-								{{ game.duration }}</p>
+		<details>
+			<summary>
+				Parties enregistrées :
+			</summary>
+			<div class="cards">
+				{% for game in games %}
+					<div class="card">
+						<h3 class="card__title">Partie n°
+							{{ game.id }}</h3>
+						<div class="card__inner">
+							<div class="card__content">
+								<p class="card__date">📅
+									{{ game.date|date('Y-m-d H:i:s') }}</p>
+								<p class="card__player">ID joueur 1 :
+									{{ game.player1 }}</p>
+								<p class="card__player">ID joueur 2 :
+									{{ game.player2 }}</p>
+								<p class="card_winner">🏆
+									{{ game.winner }}</p>
+								<p class="card__duration">⏱️
+									{{ game.duration }}</p>
+							</div>
+							<table class="board">
+								{% for row in game.board %}
+									<tr class="board__row">
+										{% for cell in row %}
+											{% if cell == 'red' %}
+												<td class="board__cell board__cell--red"></td>
+											{% elseif cell == 'yellow' %}
+												<td class="board__cell board__cell--yellow"></td>
+											{% else %}
+												<td class="board__cell board__cell--empty"></td>
+											{% endif %}
+										{% endfor %}
+									</tr>
+								{% endfor %}
+							</table>
 						</div>
-						<table class="board">
-							{% for row in game.board %}
-								<tr class="board__row">
-									{% for cell in row %}
-										{% if cell == 'red' %}
-											<td class="board__cell board__cell--red"></td>
-										{% elseif cell == 'yellow' %}
-											<td class="board__cell board__cell--yellow"></td>
-										{% else %}
-											<td class="board__cell board__cell--empty"></td>
-										{% endif %}
-									{% endfor %}
-								</tr>
-							{% endfor %}
-						</table>
 					</div>
-				</div>
-			{% endfor %}
-		</div>
-	{% else %}
-		<p>Aucune partie n'est enregistrée pour le moment</p>
-	{% endif %}
+				{% endfor %}
+			</div>
+		{% else %}
+			<p>Aucune partie n'est enregistrée pour le moment</p>
+		{% endif %}
+	</details>
 {% endblock %}
