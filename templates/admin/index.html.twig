@@ -24,15 +24,15 @@
 			gap: 32px;
 		}
 
-        .card__content {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+		.card__content {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+		}
 
-        .card p {
-            margin: 0
-        }
+		.card p {
+			margin: 0
+		}
 
 		.board {
 			border-collapse: collapse;
@@ -59,10 +59,39 @@
 			background-color: red
 		}
 	</style>
+	{% if users %}
+		<h2>Liste des utilisateurs :</h2>
+		<ul class="users">
+			{% for user in users %}
+				<li class="user">
+					<p class="user__id">ID :
+						{{ user.id }}</p>
+					<p class="user__id">Roles :
+						{% for role in user.roles %}
+							<span>{{role}}</span>
+						{% endfor %}
+					</p>
+					<p class="user__email">Email :
+						{{ user.email }}</p>
+					<form action="{{ path('admin_block_user', { 'userId': user.id }) }}" method="post">
+						<input type="hidden" name="_token" value="{{ csrf_token('block_user_' ~ user.id) }}">
+						<button type="submit" class="btn btn-block">
+							{% if user.blocked %}
+								Débloquer
+							{% else %}
+								Bloquer
+							{% endif %}
+						</button>
+					</form>
 
-	<h1>Parties enregistrées</h1>
+				</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+	{% endif %}
 
 	{%if games %}
+		<h2>Parties enregistrées</h2>
 		<div class="cards">
 			{% for game in games %}
 				<div class="card">
