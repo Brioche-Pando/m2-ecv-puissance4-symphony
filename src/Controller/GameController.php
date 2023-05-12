@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\GameRepository;
+use App\Entity\Game;
 
 /**
  * @Security("is_granted('ROLE_USER')")
@@ -15,6 +17,14 @@ class GameController extends AbstractController
 {
     private const BOARD_COLUMNS = 7;
     private const BOARD_ROWS = 6;
+    private $startTime;
+
+    private $gameRepository;
+
+    public function __construct(GameRepository $gameRepository)
+    {
+        $this->gameRepository = $gameRepository;
+    }
 
     #[Route('/game', name: 'app_game')]
     public function play(Request $request): Response
@@ -24,14 +34,23 @@ class GameController extends AbstractController
         $isEnd = false;
         $winner = false;
 
+        if (!$request->getSession()->has('startTime')) {
+            $this->startTime = time();
+            $request->getSession()->set('startTime', $this->startTime);
+        } else {
+            $this->startTime = $request->getSession()->get('startTime');
+        }
+
         if ($request->isMethod('POST')) {
             $column = $request->get('column');
             $board = $this->addTokenToColumn($board, $column, $currentPlayer);
             $isEnd = $this->checkEndGame($board, $currentPlayer);
-
-            var_dump($isEnd);
             if ($isEnd) {
                 $winner = 'tie' === $isEnd ? 'tie' : $currentPlayer;
+
+                $endTime = time();
+                $duration = $endTime - $this->startTime;
+                $this->registerGameInDB($board, $currentPlayer, $duration);
             } else {
                 // Switch player
                 $currentPlayer = ('yellow' === $currentPlayer) ? 'red' : 'yellow';
@@ -55,6 +74,25 @@ class GameController extends AbstractController
         $request->getSession()->invalidate();
 
         return $this->redirectToRoute('app_game');
+    }
+
+    private function registerGameInDB(array $board, string $currentPlayer, int $duration): void
+    {
+        $game = new Game();
+        $game->setDate(new \DateTime());
+        $game->setPlayer1($this->getUser()->getId());
+        $game->setPlayer2($this->getUser()->getId());
+        $game->setWinner($currentPlayer);
+        $game->setBoard($board);
+        
+        // Convertir la durée en minutes et secondes
+        $minutes = floor($duration / 60);
+        $seconds = $duration % 60;
+        $formattedDuration = sprintf('%02d:%02d', $minutes, $seconds);
+    
+        $game->setDuration($formattedDuration);
+
+        $this->gameRepository->save($game, true);
     }
 
     private function getEmptyBoard(): array
