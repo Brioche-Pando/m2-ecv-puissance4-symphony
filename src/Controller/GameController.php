@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  * @Security("is_granted('ROLE_USER')")
@@ -15,17 +15,6 @@ class GameController extends AbstractController
 {
     private const BOARD_COLUMNS = 7;
     private const BOARD_ROWS = 6;
-
-    // #[Route('/game', name: 'app_game')]
-    // public function index(Request $request): Response
-    // {
-    //     $board = $request->getSession()->get('board', $this->getEmptyBoard());
-    //     $currentPlayer = $request->getSession()->get('currentPlayer', 'yellow');
-
-    //     return $this->render('game/index.html.twig', [
-    //         'controller_name' => 'GameController'
-    //     ]);
-    // }
 
     #[Route('/game', name: 'app_game')]
     public function play(Request $request): Response
@@ -42,10 +31,10 @@ class GameController extends AbstractController
 
             var_dump($isEnd);
             if ($isEnd) {
-                $winner = $isEnd === 'tie' ? 'tie' : $currentPlayer;
+                $winner = 'tie' === $isEnd ? 'tie' : $currentPlayer;
             } else {
                 // Switch player
-                $currentPlayer = ($currentPlayer === 'yellow') ? 'red' : 'yellow';
+                $currentPlayer = ('yellow' === $currentPlayer) ? 'red' : 'yellow';
 
                 $request->getSession()->set('board', $board);
                 $request->getSession()->set('currentPlayer', $currentPlayer);
@@ -56,7 +45,7 @@ class GameController extends AbstractController
             'board' => $board,
             'currentPlayer' => $currentPlayer,
             'isEnd' => $isEnd,
-            'winner' => $winner
+            'winner' => $winner,
         ]);
     }
 
@@ -72,15 +61,17 @@ class GameController extends AbstractController
     {
         $board = [];
 
-        for ($i = 0; $i < self::BOARD_ROWS; $i++) {
+        for ($i = 0; $i < self::BOARD_ROWS; ++$i) {
             $board[$i] = array_fill(0, self::BOARD_COLUMNS, '');
         }
+
         return $board;
     }
+
     private function addTokenToColumn(array $board, int $column, string $token): array
     {
-        for ($i = self::BOARD_ROWS - 1; $i >= 0; $i--) {
-            if ($board[$i][$column] === '') {
+        for ($i = self::BOARD_ROWS - 1; $i >= 0; --$i) {
+            if ('' === $board[$i][$column]) {
                 $board[$i][$column] = $token;
                 break;
             }
@@ -91,14 +82,13 @@ class GameController extends AbstractController
 
     private function checkEndGame(array $board, string $player): string
     {
-
         // Check horizontal
-        for ($i = 0; $i < self::BOARD_ROWS; $i++) {
+        for ($i = 0; $i < self::BOARD_ROWS; ++$i) {
             $count = 0;
-            for ($j = 0; $j < self::BOARD_COLUMNS; $j++) {
+            for ($j = 0; $j < self::BOARD_COLUMNS; ++$j) {
                 if ($board[$i][$j] === $player) {
-                    $count++;
-                    if ($count === 4) {
+                    ++$count;
+                    if (4 === $count) {
                         return $player;
                     }
                 } else {
@@ -108,12 +98,12 @@ class GameController extends AbstractController
         }
 
         // Check vertical
-        for ($j = 0; $j < self::BOARD_COLUMNS; $j++) {
+        for ($j = 0; $j < self::BOARD_COLUMNS; ++$j) {
             $count = 0;
-            for ($i = 0; $i < self::BOARD_ROWS; $i++) {
+            for ($i = 0; $i < self::BOARD_ROWS; ++$i) {
                 if ($board[$i][$j] === $player) {
-                    $count++;
-                    if ($count === 4) {
+                    ++$count;
+                    if (4 === $count) {
                         return $player;
                     }
                 } else {
@@ -123,13 +113,13 @@ class GameController extends AbstractController
         }
 
         // Check diagonal (top left to bottom right)
-        for ($i = 0; $i <= self::BOARD_ROWS - 4; $i++) {
-            for ($j = 0; $j <= self::BOARD_COLUMNS - 4; $j++) {
+        for ($i = 0; $i <= self::BOARD_ROWS - 4; ++$i) {
+            for ($j = 0; $j <= self::BOARD_COLUMNS - 4; ++$j) {
                 $count = 0;
-                for ($k = 0; $k < 4; $k++) {
+                for ($k = 0; $k < 4; ++$k) {
                     if ($board[$i + $k][$j + $k] === $player) {
-                        $count++;
-                        if ($count === 4) {
+                        ++$count;
+                        if (4 === $count) {
                             return $player;
                         }
                     } else {
@@ -140,13 +130,13 @@ class GameController extends AbstractController
         }
 
         // Check diagonal (bottom left to top right)
-        for ($i = self::BOARD_ROWS - 1; $i >= 3; $i--) {
-            for ($j = 0; $j <= self::BOARD_COLUMNS - 4; $j++) {
+        for ($i = self::BOARD_ROWS - 1; $i >= 3; --$i) {
+            for ($j = 0; $j <= self::BOARD_COLUMNS - 4; ++$j) {
                 $count = 0;
-                for ($k = 0; $k < 4; $k++) {
+                for ($k = 0; $k < 4; ++$k) {
                     if ($board[$i - $k][$j + $k] === $player) {
-                        $count++;
-                        if ($count === 4) {
+                        ++$count;
+                        if (4 === $count) {
                             return $player;
                         }
                     } else {
@@ -157,9 +147,9 @@ class GameController extends AbstractController
         }
 
         // Check for tie
-        for ($i = 0; $i < self::BOARD_ROWS; $i++) {
-            for ($j = 0; $j < self::BOARD_COLUMNS; $j++) {
-                if ($board[$i][$j] === '') {
+        for ($i = 0; $i < self::BOARD_ROWS; ++$i) {
+            for ($j = 0; $j < self::BOARD_COLUMNS; ++$j) {
+                if ('' === $board[$i][$j]) {
                     return false;
                 }
             }
