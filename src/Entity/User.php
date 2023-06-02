@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
@@ -18,18 +19,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Assert\Email(
+        message: 'The email {{ value }} is not a valid email.',
+    )]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Assert\Type(
+        type: 'array',
+        message: 'The value {{ value }} is not a valid {{ type }}.',
+    )]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\Type(
+        type: 'String',
+        message: 'The value {{ value }} is not a valid {{ type }}.',
+    )]
     private ?string $password = null;
 
     #[ORM\Column]
+    #[Assert\Type(
+        type: 'boolean',
+        message: 'The value {{ value }} is not a valid {{ type }}.',
+    )]
     private ?bool $blocked = null;
 
     public function getId(): ?int
