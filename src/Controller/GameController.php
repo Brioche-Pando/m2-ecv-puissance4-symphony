@@ -29,7 +29,7 @@ class GameController extends AbstractController
     }
 
     #[Route('/game', name: 'app_game')]
-    public function play(Request $request): Response
+    public function play(Request $request, MailerInterface $mailer): Response
     {
         $board = $request->getSession()->get('board', $this->getEmptyBoard());
         $currentPlayer = $request->getSession()->get('currentPlayer', 'yellow');
@@ -53,8 +53,7 @@ class GameController extends AbstractController
                 $endTime = time();
                 $duration = $endTime - $this->startTime;
                 $this->registerGameInDB($board, $currentPlayer, $duration);
-                $mailerInterface = new MailerInterface();
-                $this->sendEmail($mailerInterface);
+                $this->sendEmail($mailer, $currentPlayer);
             } else {
                 // Switch player
                 $currentPlayer = ('yellow' === $currentPlayer) ? 'red' : 'yellow';
@@ -80,18 +79,18 @@ class GameController extends AbstractController
         return $this->redirectToRoute('app_game');
     }
 
-    private function sendEmail(MailerInterface $mailer): void
+    private function sendEmail(MailerInterface $mailer, $winner): void
     {
         $email = (new Email())
-            ->from('b.neveu09@gmail.com')
+            ->from('developpement.appus@gmail.com')
             ->to('b.neveu09@gmail')
             //->cc('cc@example.com')
             //->bcc('bcc@example.com')
             //->replyTo('fabien@example.com')
             //->priority(Email::PRIORITY_HIGH)
-            ->subject('Puissane 4 : Fin de partie')
+            ->subject('Puissance 4 : Fin de partie')
             ->text('Fin de partie')
-            ->html('<p>Fin de partie</p>');
+            ->html('<p>Fin de partie. Le gagnant est '. $winner .'! Félicitations</p>');
 
         $mailer->send($email);
     }
