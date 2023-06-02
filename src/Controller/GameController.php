@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\GameRepository;
 use App\Entity\Game;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 /**
  * @Security("is_granted('ROLE_USER')")
@@ -51,6 +53,8 @@ class GameController extends AbstractController
                 $endTime = time();
                 $duration = $endTime - $this->startTime;
                 $this->registerGameInDB($board, $currentPlayer, $duration);
+                $mailerInterface = new MailerInterface();
+                $this->sendEmail($mailerInterface);
             } else {
                 // Switch player
                 $currentPlayer = ('yellow' === $currentPlayer) ? 'red' : 'yellow';
@@ -74,6 +78,22 @@ class GameController extends AbstractController
         $request->getSession()->invalidate();
 
         return $this->redirectToRoute('app_game');
+    }
+
+    private function sendEmail(MailerInterface $mailer): void
+    {
+        $email = (new Email())
+            ->from('b.neveu09@gmail.com')
+            ->to('b.neveu09@gmail')
+            //->cc('cc@example.com')
+            //->bcc('bcc@example.com')
+            //->replyTo('fabien@example.com')
+            //->priority(Email::PRIORITY_HIGH)
+            ->subject('Puissane 4 : Fin de partie')
+            ->text('Fin de partie')
+            ->html('<p>Fin de partie</p>');
+
+        $mailer->send($email);
     }
 
     private function registerGameInDB(array $board, string $currentPlayer, int $duration): void
