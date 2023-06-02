@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\GameRepository;
 use App\Entity\Game;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
@@ -29,7 +30,7 @@ class GameController extends AbstractController
     }
 
     #[Route('/game', name: 'app_game')]
-    public function play(Request $request, MailerInterface $mailer): Response
+    public function play(Request $request, MailerInterface $mailer, LoggerInterface $logger): Response
     {
         $board = $request->getSession()->get('board', $this->getEmptyBoard());
         $currentPlayer = $request->getSession()->get('currentPlayer', 'yellow');
@@ -57,7 +58,7 @@ class GameController extends AbstractController
             } else {
                 // Switch player
                 $currentPlayer = ('yellow' === $currentPlayer) ? 'red' : 'yellow';
-
+                $logger->info($currentPlayer . ' est le prochain jouer à jouer');
                 $request->getSession()->set('board', $board);
                 $request->getSession()->set('currentPlayer', $currentPlayer);
             }
