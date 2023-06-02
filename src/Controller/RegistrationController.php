@@ -26,9 +26,13 @@ class RegistrationController extends AbstractController
     {
         $this->emailVerifier = $emailVerifier;
     }
-    #[Route('/register', name: 'app_register')]
+    // #[Route('/register', name: 'app_register')]
+    #[Route('/register/{_locale}', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, AppAuthenticator $authenticator, EntityManagerInterface $entityManager): Response
     {
+        $locale = $request->getLocale();
+        $request->getSession()->set('_locale', $locale);
+
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
