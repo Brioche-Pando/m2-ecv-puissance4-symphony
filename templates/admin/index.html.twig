@@ -122,6 +122,8 @@
 									{{ game.winner }}</p>
 								<p class="card__duration">⏱️
 									{{ game.duration }}</p>
+								<a href="{{ path('admin_serialized_game', { gameId: game.id ,extension: 'json' }) }}">Voir le format json</a>
+								<a href="{{ path('admin_serialized_game', { gameId: game.id ,extension: 'xml' }) }}">Voir le format xml</a>
 							</div>
 							<table class="board">
 								{% for row in game.board %}
